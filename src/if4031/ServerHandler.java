@@ -9,13 +9,25 @@ package if4031;
  *
  * @author Imballinst
  */
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Sorts.descending;
 import org.apache.thrift.TException;
 import java.util.List;
+import org.bson.Document;
+import static com.mongodb.client.model.Filters.*;
+import java.util.Collection;
 import java.util.Random;
 import org.apache.thrift.transport.TTransportException;
 
+
 public class ServerHandler implements ServerService.Iface {
 
+    /* Db Config */
+    MongoClient mongoClient = new MongoClient("localhost");
+    MongoDatabase database = mongoClient.getDatabase("chatRPC");
+    
     @Override
     public String regNick(String token, String nick) throws TException {
         if (token == null && nick != null) {
@@ -35,25 +47,36 @@ public class ServerHandler implements ServerService.Iface {
                 newNick = randomNick();
             } while (isNickExist(newNick));
             //save nick
+            saveNick(nick);
             return newNick;
         }
         else {
             //already registered
-            return "Cannot register your nick.";
+            return "Nick already registered.";
         }
     }
 
     @Override
     public String joinChannel(String token, String channel) throws TException {
-        if (isChannelExist(channel)) {
-            //if channel exists
-            //join channel
-            return "Channel subscribed.";
-        }
-        else {
-            //if channel doesn't exist
-            //create AND join channel
+        
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        
+        /* cek channel exist */
+        if(this.isChannelExist(channel))
+        {
+            /* subscribe */
+            userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
+            
             return "Channel created and subscribed.";
+        }
+        else
+        {
+            // create channel 
+            this.createChannel(channel);
+            
+            /* subscribe */
+            userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
+            return "Channel subscribed.";
         }
     }
 
@@ -73,12 +96,35 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean saveMessage(String token, String channel, String message) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.saveToDB(token, channel, message);
     }
 
     @Override
     public boolean saveToDB(String token, String channel, String message) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        MongoCollection<Document> collection = database.getCollection("Message");
+        int lastId;
+        try
+        {
+            lastId = this.getLastMessageId();
+            lastId++;
+        }
+        catch(Exception e){
+            System.out.println("Masuk exception");
+            lastId = 1;
+        }
+        Document doc = new Document("id", lastId)
+                        .append("nick", token)
+                        .append("channel", channel)
+                        .append("message", message);
+        collection.insertOne(doc);
+        return true;
+    }
+    
+    private int getLastMessageId()
+    {
+        MongoCollection<Document> collection = database.getCollection("Message");
+        Document myDoc = collection.find().sort(descending("id")).first();
+        return myDoc.getInteger("id");
     }
 
     @Override
@@ -135,12 +181,14 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean isNickExist(String nick) throws TException {
-        return true;
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        return userCollection.find(eq("nick", nick)).first() != null;
     }
 
     @Override
     public boolean isChannelExist(String channel) throws TException {
-        return true;
+        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+        return channelCollection.find(eq("name", channel)).first() != null;
     }
 
     @Override
@@ -150,6 +198,9 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String saveNick(String nick) throws TException {
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        Document doc = new Document("nick", nick);
+        userCollection.insertOne(doc);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -168,7 +219,14 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String createChannel(String channel) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+            
+            /* channel not exist */
+            Document doc = new Document("name", channel);
+        
+            channelCollection.insertOne(doc);
+            
+            return "Channel berhasil dibuat";
     }
 
     @Override
