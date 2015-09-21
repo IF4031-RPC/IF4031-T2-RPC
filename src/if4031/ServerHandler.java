@@ -16,6 +16,7 @@ import static com.mongodb.client.model.Sorts.descending;
 import org.apache.thrift.TException;
 import java.util.List;
 import org.bson.Document;
+import static com.mongodb.client.model.Filters.*;
 
 public class ServerHandler implements ServerService.Iface {
 
@@ -50,14 +51,27 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String joinChannel(String token, String channel) throws TException {
-        if (1 == 1) {
-            //if channel doesn't exist
-            //create AND join channel
+        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        
+        System.out.println(channelCollection.find(eq("name", channel)).first());
+        
+        /* cek channel exist */
+        if(channelCollection.find(eq("name", channel)).first() == null)
+        {
+            /* channel not exist */
+            Document doc = new Document("name", channel);
+        
+            channelCollection.insertOne(doc);
+            
+            /* subscribe */
+            userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
+            
             return "Channel created and subscribed.";
         }
-        else {
-            //if channel exists
-            //join channel
+        else
+        {
+            userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
             return "Channel subscribed.";
         }
     }
