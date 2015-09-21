@@ -9,11 +9,20 @@ package if4031;
  *
  * @author Imballinst
  */
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Sorts.descending;
 import org.apache.thrift.TException;
 import java.util.List;
+import org.bson.Document;
 
 public class ServerHandler implements ServerService.Iface {
 
+    /* Db Config */
+    MongoClient mongoClient = new MongoClient("localhost");
+    MongoDatabase database = mongoClient.getDatabase("chatRPC");
+    
     @Override
     public String regNick(String token, String nick) throws TException {
         return nick;
@@ -36,7 +45,30 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean saveToDB(String token, String channel, String message) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        MongoCollection<Document> collection = database.getCollection("Message");
+        int lastId;
+        try
+        {
+            lastId = this.getLastMessageId();
+            lastId++;
+        }
+        catch(Exception e){
+            System.out.println("Masuk exception");
+            lastId = 1;
+        }
+        Document doc = new Document("id", lastId)
+                        .append("nick", token)
+                        .append("channel", channel)
+                        .append("message", message);
+        collection.insertOne(doc);
+        return true;
+    }
+    
+    private int getLastMessageId()
+    {
+        MongoCollection<Document> collection = database.getCollection("Message");
+        Document myDoc = collection.find().sort(descending("id")).first();
+        return myDoc.getInteger("id");
     }
 
     @Override
