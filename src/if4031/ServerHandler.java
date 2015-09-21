@@ -89,7 +89,7 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String leaveChannel(String token, String channel) throws TException {
-        if (isChannelSubscribed(channel)) {
+        if (isChannelSubscribed(token,channel)) {
             //if channel is subscribed
             //leave channel
             this.leave(token, channel);
@@ -210,11 +210,6 @@ public class ServerHandler implements ServerService.Iface {
     }
 
     @Override
-    public boolean isChannelSubscribed(String channel) throws TException {
-        return true;
-    }
-
-    @Override
     public String saveNick(String nick) throws TException {
         MongoCollection<Document> userCollection = database.getCollection("User");
         Document doc = new Document("nick", nick);
@@ -249,6 +244,11 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String deleteMember(String token, String channel) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isChannelSubscribed(String token, String channel) throws TException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

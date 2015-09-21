@@ -57,7 +57,7 @@ public class ServerService {
 
     public boolean isChannelExist(String channel) throws org.apache.thrift.TException;
 
-    public boolean isChannelSubscribed(String channel) throws org.apache.thrift.TException;
+    public boolean isChannelSubscribed(String token, String channel) throws org.apache.thrift.TException;
 
     public String saveNick(String nick) throws org.apache.thrift.TException;
 
@@ -89,7 +89,7 @@ public class ServerService {
 
     public void isChannelExist(String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void isChannelSubscribed(String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void isChannelSubscribed(String token, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
     public void saveNick(String nick, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
@@ -337,15 +337,16 @@ public class ServerService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "isChannelExist failed: unknown result");
     }
 
-    public boolean isChannelSubscribed(String channel) throws org.apache.thrift.TException
+    public boolean isChannelSubscribed(String token, String channel) throws org.apache.thrift.TException
     {
-      send_isChannelSubscribed(channel);
+      send_isChannelSubscribed(token, channel);
       return recv_isChannelSubscribed();
     }
 
-    public void send_isChannelSubscribed(String channel) throws org.apache.thrift.TException
+    public void send_isChannelSubscribed(String token, String channel) throws org.apache.thrift.TException
     {
       isChannelSubscribed_args args = new isChannelSubscribed_args();
+      args.setToken(token);
       args.setChannel(channel);
       sendBase("isChannelSubscribed", args);
     }
@@ -785,23 +786,26 @@ public class ServerService {
       }
     }
 
-    public void isChannelSubscribed(String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void isChannelSubscribed(String token, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      isChannelSubscribed_call method_call = new isChannelSubscribed_call(channel, resultHandler, this, ___protocolFactory, ___transport);
+      isChannelSubscribed_call method_call = new isChannelSubscribed_call(token, channel, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class isChannelSubscribed_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String token;
       private String channel;
-      public isChannelSubscribed_call(String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public isChannelSubscribed_call(String token, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
+        this.token = token;
         this.channel = channel;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("isChannelSubscribed", org.apache.thrift.protocol.TMessageType.CALL, 0));
         isChannelSubscribed_args args = new isChannelSubscribed_args();
+        args.setToken(token);
         args.setChannel(channel);
         args.write(prot);
         prot.writeMessageEnd();
@@ -1174,7 +1178,7 @@ public class ServerService {
 
       public isChannelSubscribed_result getResult(I iface, isChannelSubscribed_args args) throws org.apache.thrift.TException {
         isChannelSubscribed_result result = new isChannelSubscribed_result();
-        result.success = iface.isChannelSubscribed(args.channel);
+        result.success = iface.isChannelSubscribed(args.token, args.channel);
         result.setSuccessIsSet(true);
         return result;
       }
@@ -1801,7 +1805,7 @@ public class ServerService {
       }
 
       public void start(I iface, isChannelSubscribed_args args, org.apache.thrift.async.AsyncMethodCallback<Boolean> resultHandler) throws TException {
-        iface.isChannelSubscribed(args.channel,resultHandler);
+        iface.isChannelSubscribed(args.token, args.channel,resultHandler);
       }
     }
 
@@ -9511,7 +9515,8 @@ public class ServerService {
   public static class isChannelSubscribed_args implements org.apache.thrift.TBase<isChannelSubscribed_args, isChannelSubscribed_args._Fields>, java.io.Serializable, Cloneable, Comparable<isChannelSubscribed_args>   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("isChannelSubscribed_args");
 
-    private static final org.apache.thrift.protocol.TField CHANNEL_FIELD_DESC = new org.apache.thrift.protocol.TField("channel", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField TOKEN_FIELD_DESC = new org.apache.thrift.protocol.TField("token", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField CHANNEL_FIELD_DESC = new org.apache.thrift.protocol.TField("channel", org.apache.thrift.protocol.TType.STRING, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -9519,11 +9524,13 @@ public class ServerService {
       schemes.put(TupleScheme.class, new isChannelSubscribed_argsTupleSchemeFactory());
     }
 
+    public String token; // required
     public String channel; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      CHANNEL((short)1, "channel");
+      TOKEN((short)1, "token"),
+      CHANNEL((short)2, "channel");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -9538,7 +9545,9 @@ public class ServerService {
        */
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
-          case 1: // CHANNEL
+          case 1: // TOKEN
+            return TOKEN;
+          case 2: // CHANNEL
             return CHANNEL;
           default:
             return null;
@@ -9583,6 +9592,8 @@ public class ServerService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.TOKEN, new org.apache.thrift.meta_data.FieldMetaData("token", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "String")));
       tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "String")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -9593,9 +9604,11 @@ public class ServerService {
     }
 
     public isChannelSubscribed_args(
+      String token,
       String channel)
     {
       this();
+      this.token = token;
       this.channel = channel;
     }
 
@@ -9603,6 +9616,9 @@ public class ServerService {
      * Performs a deep copy on <i>other</i>.
      */
     public isChannelSubscribed_args(isChannelSubscribed_args other) {
+      if (other.isSetToken()) {
+        this.token = other.token;
+      }
       if (other.isSetChannel()) {
         this.channel = other.channel;
       }
@@ -9614,7 +9630,32 @@ public class ServerService {
 
     @Override
     public void clear() {
+      this.token = null;
       this.channel = null;
+    }
+
+    public String getToken() {
+      return this.token;
+    }
+
+    public isChannelSubscribed_args setToken(String token) {
+      this.token = token;
+      return this;
+    }
+
+    public void unsetToken() {
+      this.token = null;
+    }
+
+    /** Returns true if field token is set (has been assigned a value) and false otherwise */
+    public boolean isSetToken() {
+      return this.token != null;
+    }
+
+    public void setTokenIsSet(boolean value) {
+      if (!value) {
+        this.token = null;
+      }
     }
 
     public String getChannel() {
@@ -9643,6 +9684,14 @@ public class ServerService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
+      case TOKEN:
+        if (value == null) {
+          unsetToken();
+        } else {
+          setToken((String)value);
+        }
+        break;
+
       case CHANNEL:
         if (value == null) {
           unsetChannel();
@@ -9656,6 +9705,9 @@ public class ServerService {
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
+      case TOKEN:
+        return getToken();
+
       case CHANNEL:
         return getChannel();
 
@@ -9670,6 +9722,8 @@ public class ServerService {
       }
 
       switch (field) {
+      case TOKEN:
+        return isSetToken();
       case CHANNEL:
         return isSetChannel();
       }
@@ -9689,6 +9743,15 @@ public class ServerService {
       if (that == null)
         return false;
 
+      boolean this_present_token = true && this.isSetToken();
+      boolean that_present_token = true && that.isSetToken();
+      if (this_present_token || that_present_token) {
+        if (!(this_present_token && that_present_token))
+          return false;
+        if (!this.token.equals(that.token))
+          return false;
+      }
+
       boolean this_present_channel = true && this.isSetChannel();
       boolean that_present_channel = true && that.isSetChannel();
       if (this_present_channel || that_present_channel) {
@@ -9704,6 +9767,11 @@ public class ServerService {
     @Override
     public int hashCode() {
       List<Object> list = new ArrayList<Object>();
+
+      boolean present_token = true && (isSetToken());
+      list.add(present_token);
+      if (present_token)
+        list.add(token);
 
       boolean present_channel = true && (isSetChannel());
       list.add(present_channel);
@@ -9721,6 +9789,16 @@ public class ServerService {
 
       int lastComparison = 0;
 
+      lastComparison = Boolean.valueOf(isSetToken()).compareTo(other.isSetToken());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetToken()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.token, other.token);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       lastComparison = Boolean.valueOf(isSetChannel()).compareTo(other.isSetChannel());
       if (lastComparison != 0) {
         return lastComparison;
@@ -9751,6 +9829,14 @@ public class ServerService {
       StringBuilder sb = new StringBuilder("isChannelSubscribed_args(");
       boolean first = true;
 
+      sb.append("token:");
+      if (this.token == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.token);
+      }
+      first = false;
+      if (!first) sb.append(", ");
       sb.append("channel:");
       if (this.channel == null) {
         sb.append("null");
@@ -9801,7 +9887,15 @@ public class ServerService {
             break;
           }
           switch (schemeField.id) {
-            case 1: // CHANNEL
+            case 1: // TOKEN
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.token = iprot.readString();
+                struct.setTokenIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // CHANNEL
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.channel = iprot.readString();
                 struct.setChannelIsSet(true);
@@ -9824,6 +9918,11 @@ public class ServerService {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.token != null) {
+          oprot.writeFieldBegin(TOKEN_FIELD_DESC);
+          oprot.writeString(struct.token);
+          oprot.writeFieldEnd();
+        }
         if (struct.channel != null) {
           oprot.writeFieldBegin(CHANNEL_FIELD_DESC);
           oprot.writeString(struct.channel);
@@ -9847,10 +9946,16 @@ public class ServerService {
       public void write(org.apache.thrift.protocol.TProtocol prot, isChannelSubscribed_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
-        if (struct.isSetChannel()) {
+        if (struct.isSetToken()) {
           optionals.set(0);
         }
-        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetChannel()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetToken()) {
+          oprot.writeString(struct.token);
+        }
         if (struct.isSetChannel()) {
           oprot.writeString(struct.channel);
         }
@@ -9859,8 +9964,12 @@ public class ServerService {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, isChannelSubscribed_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(1);
+        BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
+          struct.token = iprot.readString();
+          struct.setTokenIsSet(true);
+        }
+        if (incoming.get(1)) {
           struct.channel = iprot.readString();
           struct.setChannelIsSet(true);
         }
