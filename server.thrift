@@ -15,5 +15,5 @@ service ServerService
 	boolean saveMessage(1: String token, 2: String channel, 3: String message);
 	boolean saveToDB(1: String token, 2: String channel, 3: String message);
 	String getMessage(1: list<ChannelLastMsg> clm, 2: String token);
-	String iSend(1: String token, 2: String message)
+	String iSend(1: String token, 2: String message);
 }
