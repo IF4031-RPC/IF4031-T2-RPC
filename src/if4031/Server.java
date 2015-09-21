@@ -23,25 +23,48 @@ public class Server {
     
     public static void main(String [] args) {
         try {
-        handler = new ServerHandler();
-        processor = new ServerService.Processor(handler);
-        Runnable simple = new Runnable() {
-        public void run() {
-        simple(processor);
-        }
-        };
-        new Thread(simple).start();
+            handler = new ServerHandler();
+            processor = new ServerService.Processor(handler);
+            
+            Runnable simple = new Runnable() {
+                public void run() {
+                    simple(processor);
+                }
+            };
+            Runnable simple2 = new Runnable() {
+                public void run() {
+                    simple2(processor);
+                }
+            };
+            
+            new Thread(simple).start();
+            new Thread(simple2).start();
         } catch (Exception x) {
-        x.printStackTrace();
+            x.printStackTrace();
         }
-        }
-        public static void simple(ServerService.Processor processor) {
+    }
+    
+    public static void simple(ServerService.Processor processor) {
         try {
-        TServerTransport serverTransport = new TServerSocket(9090);
-//        TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
-        TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
-        System.out.println("Starting the simple server...");
-        server.serve();
+            TServerTransport serverTransport = new TServerSocket(9090);
+    
+            TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+            System.out.println("Starting the simple server...");
+            server.serve();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void simple2(ServerService.Processor processor) {
+        try {
+            TServerTransport serverTransport = new TServerSocket(9090);
+    
+            TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+            System.out.println("Starting the pull threading...");
+            server.serve();
+            
+            Thread.sleep(500);
         } catch (Exception e) {
             e.printStackTrace();
         }
