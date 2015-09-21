@@ -59,14 +59,11 @@ public class ServerHandler implements ServerService.Iface {
     @Override
     public String joinChannel(String token, String channel) throws TException {
         
-        MongoCollection<Document> userCollection = database.getCollection("User");
-        
         /* cek channel exist */
         if(this.isChannelExist(channel))
         {
             /* subscribe */
-            userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
-            
+            this.subscribeChannel(token, channel);
             return "Channel created and subscribed.";
         }
         else
@@ -75,9 +72,19 @@ public class ServerHandler implements ServerService.Iface {
             this.createChannel(channel);
             
             /* subscribe */
-            userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
+            this.subscribeChannel(token, channel);
             return "Channel subscribed.";
         }
+    }
+    
+    private boolean subscribeChannel(String token, String channel)
+    {
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        Document channelDoc = new Document("name", channel);
+        Document listChannel = new Document("channels", new Document("name", channel));
+        userCollection.updateOne(eq("nick", token), new Document("$push", listChannel));
+        //userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
+        return true;
     }
 
     @Override
