@@ -47,11 +47,12 @@ public class ServerHandler implements ServerService.Iface {
                 newNick = randomNick();
             } while (isNickExist(newNick));
             //save nick
+            saveNick(nick);
             return newNick;
         }
         else {
             //already registered
-            return "Cannot register your nick.";
+            return "Nick already registered.";
         }
     }
 
@@ -70,12 +71,8 @@ public class ServerHandler implements ServerService.Iface {
         }
         else
         {
-            MongoCollection<Document> channelCollection = database.getCollection("Channel");
-            
-            /* channel not exist */
-            Document doc = new Document("name", channel);
-        
-            channelCollection.insertOne(doc);
+            // create channel 
+            this.createChannel(channel);
             
             /* subscribe */
             userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
@@ -98,7 +95,7 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean saveMessage(String token, String channel, String message) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.saveToDB(token, channel, message);
     }
 
     @Override
@@ -183,7 +180,8 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean isNickExist(String nick) throws TException {
-        return true;
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        return userCollection.find(eq("nick", nick)).first() != null;
     }
 
     @Override
@@ -199,6 +197,9 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String saveNick(String nick) throws TException {
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        Document doc = new Document("nick", nick);
+        userCollection.insertOne(doc);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -217,7 +218,14 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String createChannel(String channel) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+            
+            /* channel not exist */
+            Document doc = new Document("name", channel);
+        
+            channelCollection.insertOne(doc);
+            
+            return "Channel berhasil dibuat";
     }
 
     @Override
