@@ -145,13 +145,13 @@ public class ServerHandler implements ServerService.Iface {
         try {
             String[] command = message.split(" ", 2);
             switch (command[0]) {
-                case "/nick": 
+                case "/NICK": 
                     response = regNick(token, command[1]);
                     break;
-                case "/join": 
+                case "/JOIN": 
                     response = joinChannel(token, command[1]);
                     break;
-                case "/leave": 
+                case "/LEAVE": 
                     response = leaveChannel(token, command[1]);
                     break;
                 default:
@@ -168,11 +168,11 @@ public class ServerHandler implements ServerService.Iface {
                     break;
             }
         } catch (Exception e) {
-            if (message.compareTo("/nick") == 0) {
+            if (message.compareTo("/NICK") == 0) {
                 //random nick
                 response = regNick(token, null);
             }
-            else if ((message.compareTo("/join") == 0) || (message.compareTo("/leave") == 0)) {
+            else if ((message.compareTo("/JOIN") == 0) || (message.compareTo("/LEAVE") == 0)) {
                 //error
                 response = "Please enter channel name!";
             }

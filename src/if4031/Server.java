@@ -31,14 +31,14 @@ public class Server {
                     simple(processor);
                 }
             };
-            Runnable simple2 = new Runnable() {
-                public void run() {
-                    simple2(processor);
-                }
-            };
-            
-            new Thread(simple).start();
-            new Thread(simple2).start();
+//            Runnable simple2 = new Runnable() {
+//                public void run() {
+//                    simple2(processor);
+//                }
+//            };
+//            
+//            new Thread(simple).start();
+//            new Thread(simple2).start();
         } catch (Exception x) {
             x.printStackTrace();
         }
