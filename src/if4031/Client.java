@@ -27,6 +27,15 @@ public class Client {
             TProtocol protocol = new TBinaryProtocol(transport);
             ServerService.Client client = new ServerService.Client(protocol);
             perform(client);
+            
+            Runnable simple = new Runnable() {
+                public void run() {
+                    
+                        System.out.println("Hello from a thread!");
+                }
+            };
+            new Thread(simple).start();
+            
             transport.close();
         } catch (TException x) {
             x.printStackTrace();
@@ -44,11 +53,6 @@ public class Client {
             String a = client.iSend(null, command);
             System.out.println(a);
             
-//            System.out.print("Please enter your nick: ");
-//            String nick = in.nextLine();
-//            
-//            String a = client.regNick(uuid, nick);
-//            System.out.println(a);
         }
     }
 }

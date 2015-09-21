@@ -9,7 +9,9 @@ package if4031;
  *
  * @author Imballinst
  */
+import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Sorts.descending;
@@ -89,7 +91,7 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String leaveChannel(String token, String channel) throws TException {
-        if (isChannelSubscribed(channel)) {
+        if (isChannelSubscribed(token,channel)) {
             //if channel is subscribed
             //leave channel
             return this.deleteMember(token, channel);
@@ -199,21 +201,11 @@ public class ServerHandler implements ServerService.Iface {
     }
 
     @Override
-    public boolean isChannelSubscribed(String channel) throws TException {
-        MongoCollection<Document> userCollection = database.getCollection("User");
-        for(Document doc : userCollection.find(eq("nick",token)))
-        {
-            System.out.println(doc);
-        }
-        return true;
-    }
-
-    @Override
     public String saveNick(String nick) throws TException {
         MongoCollection<Document> userCollection = database.getCollection("User");
         Document doc = new Document("nick", nick);
         userCollection.insertOne(doc);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return "Nick Saved";
     }
 
     @Override
@@ -249,5 +241,19 @@ public class ServerHandler implements ServerService.Iface {
         userCollection.updateOne(match, new Document("$pull", remove));
 //        userCollection.updateOne(eq("nick",token), new Document("$pull", remove));
         return "Channel unsubscribed.";
+    }
+
+    @Override
+    public boolean isChannelSubscribed(String token, String channel) throws TException {
+//        MongoCollection<Document> userCollection = database.getCollection("User");
+//        FindIterable<Document> cursor = userCollection.find(eq("nick",token));
+//        System.out.println(cursor.);
+//        for(Document doc : userCollection.find(eq("nick",token)))
+//        {
+//            System.out.println(doc);
+//        }
+//        for(String r : userCollection.get)
+//        return true;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
