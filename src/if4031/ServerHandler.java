@@ -64,7 +64,7 @@ public class ServerHandler implements ServerService.Iface {
         {
             /* subscribe */
             this.subscribeChannel(token, channel);
-            return "Channel created and subscribed.";
+            return "Channel subscribed.";
         }
         else
         {
@@ -73,7 +73,7 @@ public class ServerHandler implements ServerService.Iface {
             
             /* subscribe */
             this.subscribeChannel(token, channel);
-            return "Channel subscribed.";
+            return "Channel created and subscribed.";
         }
     }
     
