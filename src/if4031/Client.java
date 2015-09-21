@@ -18,8 +18,7 @@ import org.apache.thrift.transport.TTransport;
 import java.util.UUID;
 
 public class Client {
-    
-        public static void main(String [] args) {
+    public static void main(String [] args) {
         try {
             TTransport transport;
             transport = new TSocket("localhost", 9090);
@@ -28,19 +27,14 @@ public class Client {
             ServerService.Client client = new ServerService.Client(protocol);
             perform(client);
             
-            Runnable simple = new Runnable() {
-                public void run() {
-                    
-                        System.out.println("Hello from a thread!");
-                }
-            };
-            new Thread(simple).start();
+            new Thread(new PrintRunnable()).start();
             
             transport.close();
         } catch (TException x) {
             x.printStackTrace();
         }
     }
+        
     private static void perform(ServerService.Client client) throws TException
     {
         String uuid = null;
@@ -52,7 +46,37 @@ public class Client {
             
             String a = client.iSend(null, command);
             System.out.println(a);
-            
         }
+    }
+}
+
+ class ReadRunnable implements Runnable {
+    @Override
+    public void run() {
+        final Scanner in = new Scanner(System.in);
+        while(in.hasNext()) {
+            final String line = in.nextLine();
+            System.out.println("Input line: " + line);
+            if ("end".equalsIgnoreCase(line)) {
+                System.out.println("Ending one thread");
+                break;
+            }
+        }
+    }
+}
+
+class PrintRunnable implements Runnable {
+    @Override
+    public void run() {
+        int i = 50;
+        while(i>0) {
+            System.out.println("Beep: " + i --);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                throw new IllegalStateException(ex);
+            }
+        }
+        System.out.println("!!!! BOOM !!!!");
     }
 }
