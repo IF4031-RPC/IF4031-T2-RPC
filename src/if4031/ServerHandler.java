@@ -81,7 +81,7 @@ public class ServerHandler implements ServerService.Iface {
     {
         MongoCollection<Document> userCollection = database.getCollection("User");
         Document channelDoc = new Document("name", channel);
-        Document listChannel = new Document("channels", new Document("name", channel));
+        Document listChannel = new Document("channels", channel);
         userCollection.updateOne(eq("nick", token), new Document("$push", listChannel));
         //userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
         return true;
@@ -92,6 +92,7 @@ public class ServerHandler implements ServerService.Iface {
         if (isChannelSubscribed(channel)) {
             //if channel is subscribed
             //leave channel
+            this.leave(token, channel);
             return "Channel unsubscribed.";
         }
         else {
@@ -99,6 +100,16 @@ public class ServerHandler implements ServerService.Iface {
             return "You aren't subscribed to that channel.";
             
         }
+    }
+    
+    private boolean leave(String token, String channel)
+    {
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        Document match = new Document("nick", token);
+        Document remove = new Document("channels", channel);
+        userCollection.updateOne(match, new Document("$pull", remove));
+//        userCollection.updateOne(eq("nick",token), new Document("$pull", remove));
+        return true;
     }
 
     @Override
