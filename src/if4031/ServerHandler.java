@@ -58,7 +58,7 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String joinChannel(String token, String channel) throws TException {
-        
+        /* belum di cek apakah udah join */
         /* cek channel exist */
         if(this.isChannelExist(channel))
         {
@@ -200,6 +200,11 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean isChannelSubscribed(String channel) throws TException {
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        for(Document doc : userCollection.find(eq("nick",token)))
+        {
+            System.out.println(doc);
+        }
         return true;
     }
 
