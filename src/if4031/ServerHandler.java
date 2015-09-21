@@ -92,24 +92,13 @@ public class ServerHandler implements ServerService.Iface {
         if (isChannelSubscribed(token,channel)) {
             //if channel is subscribed
             //leave channel
-            this.leave(token, channel);
-            return "Channel unsubscribed.";
+            return this.deleteMember(token, channel);
         }
         else {
             //if channel isn't subcribed
             return "You aren't subscribed to that channel.";
             
         }
-    }
-    
-    private boolean leave(String token, String channel)
-    {
-        MongoCollection<Document> userCollection = database.getCollection("User");
-        Document match = new Document("nick", token);
-        Document remove = new Document("channels", channel);
-        userCollection.updateOne(match, new Document("$pull", remove));
-//        userCollection.updateOne(eq("nick",token), new Document("$pull", remove));
-        return true;
     }
 
     @Override
@@ -244,7 +233,12 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String deleteMember(String token, String channel) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        MongoCollection<Document> userCollection = database.getCollection("User");
+        Document match = new Document("nick", token);
+        Document remove = new Document("channels", channel);
+        userCollection.updateOne(match, new Document("$pull", remove));
+//        userCollection.updateOne(eq("nick",token), new Document("$pull", remove));
+        return "Channel unsubscribed.";
     }
 
     @Override
