@@ -17,6 +17,10 @@ import org.apache.thrift.TException;
 import java.util.List;
 import org.bson.Document;
 import static com.mongodb.client.model.Filters.*;
+import java.util.Collection;
+import java.util.Random;
+import org.apache.thrift.transport.TTransportException;
+
 
 public class ServerHandler implements ServerService.Iface {
 
@@ -27,21 +31,23 @@ public class ServerHandler implements ServerService.Iface {
     @Override
     public String regNick(String token, String nick) throws TException {
         if (token == null && nick != null) {
-            if (1 == 1) {
-                //if nick doesn't exist
-                //save
-                return nick;
-            }
-            else {
+            if (isNickExist(nick)) {
                 //nick exists
                 return "Nick exists!";
             }
+            else {
+                //if nick doesn't exist
+                nick = saveNick(nick);
+                return nick;
+            }
         }
         else if (token == null && nick == null) {
-            //random a nick
-            //find nick
+            String newNick = "";
+            do {
+                newNick = randomNick();
+            } while (isNickExist(newNick));
             //save nick
-            return nick;
+            return newNick;
         }
         else {
             //already registered
@@ -51,19 +57,12 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String joinChannel(String token, String channel) throws TException {
-        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+        
         MongoCollection<Document> userCollection = database.getCollection("User");
         
-        System.out.println(channelCollection.find(eq("name", channel)).first());
-        
         /* cek channel exist */
-        if(channelCollection.find(eq("name", channel)).first() == null)
+        if(this.isChannelExist(channel))
         {
-            /* channel not exist */
-            Document doc = new Document("name", channel);
-        
-            channelCollection.insertOne(doc);
-            
             /* subscribe */
             userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
             
@@ -71,6 +70,14 @@ public class ServerHandler implements ServerService.Iface {
         }
         else
         {
+            MongoCollection<Document> channelCollection = database.getCollection("Channel");
+            
+            /* channel not exist */
+            Document doc = new Document("name", channel);
+        
+            channelCollection.insertOne(doc);
+            
+            /* subscribe */
             userCollection.updateOne(eq("nick", token), new Document("$set",new Document("channel", channel)));
             return "Channel subscribed.";
         }
@@ -78,7 +85,7 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String leaveChannel(String token, String channel) throws TException {
-        if (1 == 1) {
+        if (isChannelSubscribed(channel)) {
             //if channel is subscribed
             //leave channel
             return "Channel unsubscribed.";
@@ -128,48 +135,66 @@ public class ServerHandler implements ServerService.Iface {
     }
 
     @Override
-    public String iSend(String token, String message) throws TException {
-        String[] command = message.split(" ", 2);
+    public String iSend(String token, String message) throws TTransportException, TException {
         String response = "";
-        switch (command[0]) {
-            case "/nick": 
-                response = regNick(token, command[1]);
-                break;
-            case "/join": 
-                response = joinChannel(token, command[1]);
-                break;
-            case "/leave": 
-                response = leaveChannel(token, command[1]);
-                break;
-            default:
-                //send message to a channel
-                if (command[0].charAt(0) == '@') {
-                    //correct
-                    //savemessage
-                    response = "Success sending message to the channel!";
-                }
-                else {
-                    //false
-                    response = "Failed sending message to the channel.";
-                }
-                break;
+        try {
+            String[] command = message.split(" ", 2);
+            switch (command[0]) {
+                case "/nick": 
+                    response = regNick(token, command[1]);
+                    break;
+                case "/join": 
+                    response = joinChannel(token, command[1]);
+                    break;
+                case "/leave": 
+                    response = leaveChannel(token, command[1]);
+                    break;
+                default:
+                    //send message to a channel
+                    if (command[0].charAt(0) == '@') {
+                        //correct
+                        //savemessage
+                        response = "Success sending message to the channel!";
+                    }
+                    else {
+                        //false
+                        response = "Failed sending message to the channel.";
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            if (message.compareTo("/nick") == 0) {
+                //random nick
+                response = regNick(token, null);
+            }
+            else if ((message.compareTo("/join") == 0) || (message.compareTo("/leave") == 0)) {
+                //error
+                response = "Please enter channel name!";
+            }
+            else if (message.charAt(0) == '@') {
+                response = "Please enter your message for the channel.";
+            }
+            else {
+                response = "Invalid command.";
+            }
         }
         return response;
     }
 
     @Override
     public boolean isNickExist(String nick) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
     @Override
     public boolean isChannelExist(String channel) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+        return channelCollection.find(eq("name", channel)).first() != null;
     }
 
     @Override
     public boolean isChannelSubscribed(String channel) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
     @Override
@@ -179,7 +204,15 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String randomNick() throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String nick = "";
+        String[] pool = {"Zacky", "Raddy", "Will", "Ohm", "Ary", "Ardee", "Ilma", "Khidr", "Galang", "Theo", "Tereta", "Rossi", 
+            "Ivina", "Nicy", "Kiito"};
+        Random randomGenerator = new Random();
+        int randomInt = randomGenerator.nextInt(100);
+        int randomNick = randomGenerator.nextInt(15);
+        
+        nick = pool[randomNick].concat(Integer.toString(randomInt));
+        return nick;
     }
 
     @Override
