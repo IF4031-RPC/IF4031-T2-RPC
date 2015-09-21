@@ -70,6 +70,7 @@ public class ServerService {
   }
 
   public static class Client extends org.apache.thrift.TServiceClient implements Iface {
+        String uuid;
     public static class Factory implements org.apache.thrift.TServiceClientFactory<Client> {
       public Factory() {}
       public Client getClient(org.apache.thrift.protocol.TProtocol prot) {

@@ -10,7 +10,6 @@ package if4031;
  * @author Imballinst
  */
 import org.apache.thrift.TException;
-import if4031.ServerService;
 import java.util.List;
 
 public class ServerHandler implements ServerService.Iface {

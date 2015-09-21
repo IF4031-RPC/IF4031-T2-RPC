@@ -15,7 +15,6 @@ import org.apache.thrift.server.TSimpleServer;
 
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
-import if4031.ServerService;
 
 public class Server {
     public static ServerHandler handler;
