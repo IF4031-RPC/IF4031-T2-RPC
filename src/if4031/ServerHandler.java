@@ -28,7 +28,7 @@ public class ServerHandler implements ServerService.Iface {
             }
         }
         else if (token == null && nick == null) {
-            //if nick exists
+            //random a nick
             //find nick
             //save nick
             return nick;
@@ -109,5 +109,40 @@ public class ServerHandler implements ServerService.Iface {
                 break;
         }
         return response;
+    }
+
+    @Override
+    public boolean isNickExist(String nick) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isChannelExist(String channel) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isChannelSubscribed(String channel) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String saveNick(String nick) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String randomNick() throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String createChannel(String channel) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String deleteMember(String token, String channel) throws TException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
