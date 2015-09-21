@@ -17,6 +17,8 @@ import org.apache.thrift.transport.TTransport;
 import java.util.UUID;
 
 public class Client {
+    String uuid = UUID.randomUUID().toString();
+    
         public static void main(String [] args) {
         try {
             TTransport transport;
@@ -24,7 +26,6 @@ public class Client {
             transport.open();
             TProtocol protocol = new TBinaryProtocol(transport);
             ServerService.Client client = new ServerService.Client(protocol);
-            client.uuid = UUID.randomUUID().toString();
             perform(client);
             transport.close();
         } catch (TException x) {
