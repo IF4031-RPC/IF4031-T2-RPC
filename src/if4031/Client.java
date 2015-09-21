@@ -9,6 +9,7 @@ package if4031;
  *
  * @author Imballinst
  */
+import java.util.Scanner;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -17,7 +18,6 @@ import org.apache.thrift.transport.TTransport;
 import java.util.UUID;
 
 public class Client {
-    String uuid = UUID.randomUUID().toString();
     
         public static void main(String [] args) {
         try {
@@ -34,7 +34,21 @@ public class Client {
     }
     private static void perform(ServerService.Client client) throws TException
     {
-        String a = client.regNick("abc", "qwe");
-        System.out.println(a);
+        String uuid = null;
+        while (true) {
+            Scanner in = new Scanner(System.in);
+            
+            System.out.print("Please enter your command: ");
+            String command = in.nextLine();
+            
+            String a = client.iSend(null, command);
+            System.out.println(a);
+            
+//            System.out.print("Please enter your nick: ");
+//            String nick = in.nextLine();
+//            
+//            String a = client.regNick(uuid, nick);
+//            System.out.println(a);
+        }
     }
 }
