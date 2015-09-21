@@ -67,6 +67,7 @@ public class ServerHandler implements ServerService.Iface {
         else {
             //if channel isn't subcribed
             return "You aren't subscribed to that channel.";
+            
         }
     }
 
