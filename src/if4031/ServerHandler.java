@@ -16,7 +16,23 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String regNick(String token, String nick) throws TException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (token == null && nick != null) {
+            if (1 == 1) {
+                //save
+                return nick;
+            }
+            else {
+                return "Nick exists!";
+            }
+        }
+        else if (token == null && nick == null) {
+            //find nick
+            //save nick
+            return nick;
+        }
+        else {
+            return "Cannot register your nick.";
+        }
     }
 
     @Override

@@ -17,7 +17,6 @@ import org.apache.thrift.transport.TTransport;
 import java.util.UUID;
 
 public class Client {
-    String uuid = UUID.randomUUID().toString();
     
         public static void main(String [] args) {
         try {
@@ -34,7 +33,8 @@ public class Client {
     }
     private static void perform(ServerService.Client client) throws TException
     {
-        String a = client.regNick("abc", "qwe");
-        System.out.println(a);
+        String uuid = UUID.randomUUID().toString();
+        String a = client.regNick(uuid, "qwe");
+        System.out.println(uuid);
     }
 }
