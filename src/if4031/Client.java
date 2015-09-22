@@ -76,6 +76,8 @@ public class Client {
                     System.out.println(client.iSend(Client.token, command));
                     delElement(Client.list, com[1]);
                     break;
+                case "/EXIT":
+                    System.exit(0);
                 default:
                     //send message to a channel
                     System.out.println(client.iSend(Client.token, command));
