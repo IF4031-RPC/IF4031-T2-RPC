@@ -19,6 +19,7 @@ import org.apache.thrift.TException;
 import java.util.List;
 import org.bson.Document;
 import static com.mongodb.client.model.Filters.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 import org.apache.thrift.transport.TTransportException;
@@ -145,7 +146,19 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String getMessage(List<ChannelLastMsg> clm, String token) throws TException {
-        return "tes";
+        String messages = "";
+        for(ChannelLastMsg channelStruct : clm)
+        {
+            MongoCollection<Document> messageCollection = database.getCollection(channelStruct.channel+"Message");
+            FindIterable<Document> iterable = messageCollection.find(new Document("id", new Document("$gt", channelStruct.lastID)));
+            for(Document doc : iterable)
+            {
+                if(doc.getString("nick").equals(token))
+                    messages = messages + channelStruct.channel+":@" + token + ' ' + doc.getString("message") + '\n';
+//                    System.out.println(doc.getString("message"));
+            }
+        }
+        return messages;
     }
 
     @Override
