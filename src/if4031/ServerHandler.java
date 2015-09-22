@@ -110,31 +110,35 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean saveToDB(String token, String channel, String message) throws TException {
-        MongoCollection<Document> channelCollection = database.getCollection("Channel");
+        MongoCollection<Document> messageCollection = database.getCollection(channel+"Message");
         int lastId;
-        Document listMessage = new Document("messages",new Document("id", 1).append("nick", token).append("messsage", message));
-        Document updateQuery = new Document("$push", listMessage);
-        Document findQuery = new Document("name", channel);
-        channelCollection.updateOne(findQuery, updateQuery);
-//        try
-//        {
-//            lastId = this.getLastMessageId();
-//            lastId++;
-//        }
-//        catch(Exception e){
-//            lastId = 1;
-//        }
-//        Document doc = new Document("id", lastId)
-//                        .append("nick", token)
-//                        .append("channel", channel)
-//                        .append("message", message);
-//        collection.insertOne(doc);
+//        System.out.println(this.getLastMessageId(channel));
+//        Document listMessage = new Document("messages",new Document("id", 3).append("nick", token).append("messsage", message));
+//        Document updateQuery = new Document("$push", listMessage);
+//        Document findQuery = new Document("name", channel);
+//        channelCollection.updateOne(findQuery, updateQuery);
+        
+//        Document messageDoc = new Document("id", this.getLastMessageId(channel)).append("nick", token).append("message", message);
+//        messageCollection.insertOne(messageDoc);
+        
+        try
+        {
+            lastId = this.getLastMessageId(channel);
+            lastId++;
+        }
+        catch(Exception e){
+            lastId = 1;
+        }
+        Document doc = new Document("id", lastId)
+                        .append("nick", token)
+                        .append("message", message);
+        messageCollection.insertOne(doc);
         return true;
     }
     
-    private int getLastMessageId()
+    private int getLastMessageId(String channel)
     {
-        MongoCollection<Document> collection = database.getCollection("Message");
+        MongoCollection<Document> collection = database.getCollection(channel+"Message");
         Document myDoc = collection.find().sort(descending("id")).first();
         return myDoc.getInteger("id");
     }
