@@ -166,6 +166,7 @@ public class ServerHandler implements ServerService.Iface {
                 default:
                     //send message to a channel
                     if (command[0].charAt(0) == '@') {
+                        String channelName = command[0].substring(1, command[0].length());
                         //correct
                         //savemessage
                         response = "Success sending message to the channel!";
