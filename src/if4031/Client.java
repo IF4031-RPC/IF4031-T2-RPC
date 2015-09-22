@@ -9,6 +9,8 @@ package if4031;
  *
  * @author Imballinst
  */
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -20,6 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Client {
+    public static String token = "";
+    
     public static void main(String [] args) {
         new Thread(new ReadRunnable()).start();
         new Thread(new PrintRunnable()).start();
@@ -52,8 +56,15 @@ public class Client {
             System.out.print("Please enter your command: ");
             String command = in.nextLine();
             
-            String a = client.iSend(null, command);
-            System.out.println(a);
+            String[] com = command.split(" ", 2);
+            if (com[0].equals("/NICK")) {
+                Client.token = client.iSend(Client.token, command);
+            }
+            else {
+                String a = client.iSend(Client.token, command);
+                System.out.println(a);
+            }
+            
         }
     }
 }
@@ -79,8 +90,10 @@ class PrintRunnable implements Runnable {
     
     private static void perform(ServerService.Client client) throws TException, InterruptedException
     {
+        List<ChannelLastMsg> list = new ArrayList<>();
+        list.add(new ChannelLastMsg(lastID, null)
         while (true) {
-            String a = client.getMessage(null, null); //getMessage
+            String a = client.getMessage(list, Client.token); //getMessage
             System.out.println(a);
             Thread.sleep(500);
         }
