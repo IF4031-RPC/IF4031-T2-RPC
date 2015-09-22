@@ -91,16 +91,16 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String leaveChannel(String token, String channel) throws TException {
-        if (isChannelSubscribed(token,channel)) {
+//        if (isChannelSubscribed(token,channel)) {
             //if channel is subscribed
             //leave channel
             return this.deleteMember(token, channel);
-        }
-        else {
+//        }
+//        else {
             //if channel isn't subcribed
-            return "You aren't subscribed to that channel.";
+//            return "You aren't subscribed to that channel.";
             
-        }
+//        }
     }
 
     @Override
@@ -110,22 +110,25 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public boolean saveToDB(String token, String channel, String message) throws TException {
-        MongoCollection<Document> collection = database.getCollection("Message");
+        MongoCollection<Document> channelCollection = database.getCollection("Channel");
         int lastId;
-        try
-        {
-            lastId = this.getLastMessageId();
-            lastId++;
-        }
-        catch(Exception e){
-            System.out.println("Masuk exception");
-            lastId = 1;
-        }
-        Document doc = new Document("id", lastId)
-                        .append("nick", token)
-                        .append("channel", channel)
-                        .append("message", message);
-        collection.insertOne(doc);
+        Document listMessage = new Document("messages",new Document("id", 1).append("nick", token).append("messsage", message));
+        Document updateQuery = new Document("$push", listMessage);
+        Document findQuery = new Document("name", channel);
+        channelCollection.updateOne(findQuery, updateQuery);
+//        try
+//        {
+//            lastId = this.getLastMessageId();
+//            lastId++;
+//        }
+//        catch(Exception e){
+//            lastId = 1;
+//        }
+//        Document doc = new Document("id", lastId)
+//                        .append("nick", token)
+//                        .append("channel", channel)
+//                        .append("message", message);
+//        collection.insertOne(doc);
         return true;
     }
     
@@ -138,6 +141,8 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String getMessage(List<ChannelLastMsg> clm, String token) throws TException {
+        MongoCollection<Document> messageCollection = database.getCollection("Message");
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
