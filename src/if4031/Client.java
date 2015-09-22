@@ -86,7 +86,6 @@ public class Client {
     
     private static void delElement(List<ChannelLastMsg> clms, String channel)
     {
-        System.out.println("di dalam delete" + clms.get(0).channel);
         Iterator<ChannelLastMsg> itr = clms.iterator();
         while(itr.hasNext())
         {
@@ -132,13 +131,35 @@ class PrintRunnable implements Runnable {
             try{
                 String a = client.getMessage(Client.list, Client.token); //getMessage
                 if(!a.equals(""))
+                {
+                    String [] messages = a.split("\n");
+                    for(String message : messages)
+                    {
+                        int channelIndex = message.indexOf(":");
+                        String channelName = message.substring(0, channelIndex);
+                        lastIDIncrement(Client.list, channelName);
+                    }
                     System.out.println(a);
+                }
+                    
             }
             catch(Exception e)
             {
                 
             }
             Thread.sleep(500);
+        }
+    }
+    private static void lastIDIncrement(ArrayList<ChannelLastMsg> list, String channel) {
+        Iterator<ChannelLastMsg> itr = list.iterator();
+        while(itr.hasNext())
+        {
+            ChannelLastMsg clm = (ChannelLastMsg)itr.next();
+            if(clm.channel.equals(channel))
+            {
+                clm.lastID++;
+                break;
+            }
         }
     }
 }

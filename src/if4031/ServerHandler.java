@@ -157,7 +157,7 @@ public class ServerHandler implements ServerService.Iface {
                     messages = messages + channelStruct.channel+":@" + token + ' ' + doc.getString("message") + '\n';
 //                    System.out.println(doc.getString("message"));
             }
-        }
+        }   
         return messages;
     }
 
@@ -226,7 +226,7 @@ public class ServerHandler implements ServerService.Iface {
         MongoCollection<Document> userCollection = database.getCollection("User");
         Document doc = new Document("nick", nick);
         userCollection.insertOne(doc);
-        return "Nick Saved";
+        return nick;
     }
 
     @Override
