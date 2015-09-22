@@ -141,9 +141,7 @@ public class ServerHandler implements ServerService.Iface {
 
     @Override
     public String getMessage(List<ChannelLastMsg> clm, String token) throws TException {
-        MongoCollection<Document> messageCollection = database.getCollection("Message");
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return "tes";
     }
 
     @Override
