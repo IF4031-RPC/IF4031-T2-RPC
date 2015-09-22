@@ -10,6 +10,7 @@ package if4031;
  * @author Imballinst
  */
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import org.apache.thrift.TException;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
 
 public class Client {
     public static String token = "";
+    public static ArrayList<ChannelLastMsg> list = new ArrayList<>();
     
     public static void main(String [] args) {
         new Thread(new ReadRunnable()).start();
@@ -57,15 +59,51 @@ public class Client {
             String command = in.nextLine();
             
             String[] com = command.split(" ", 2);
-            if (com[0].equals("/NICK")) {
-                Client.token = client.iSend(Client.token, command);
+            switch (com[0]) {
+                case "/NICK": 
+                    Client.token = client.iSend(Client.token, command);
+                    System.out.println(Client.token);
+                    break;
+                case "/JOIN": 
+                    System.out.println(client.iSend(Client.token, command));
+                    if (Client.list.add(new ChannelLastMsg(0, com[1]))) {
+                        System.out.println("Sukses nambahin channel ke client");
+                        System.out.println(Client.list.get(0).channel);
+                    }
+                    
+                    break;
+                case "/LEAVE": 
+                    System.out.println(client.iSend(Client.token, command));
+                    delElement(Client.list, com[1]);
+                    break;
+                default:
+                    //send message to a channel
+                    System.out.println(client.iSend(Client.token, command));
+                    break;
             }
-            else {
-                String a = client.iSend(Client.token, command);
-                System.out.println(a);
-            }
-            
         }
+    }
+    
+    private static void delElement(List<ChannelLastMsg> clms, String channel)
+    {
+        System.out.println("di dalam delete" + clms.get(0).channel);
+        Iterator<ChannelLastMsg> itr = clms.iterator();
+        while(itr.hasNext())
+        {
+            ChannelLastMsg clm = (ChannelLastMsg)itr.next();
+            if(clm.channel.equals(channel))
+            {
+                itr.remove();
+                break;
+            }
+        }
+//        for(ChannelLastMsg clm : clms)
+//        {
+//            if(clm.channel.equals(channel))
+//            {
+//                clms.
+//            }
+//        }
     }
 }
 
@@ -90,11 +128,16 @@ class PrintRunnable implements Runnable {
     
     private static void perform(ServerService.Client client) throws TException, InterruptedException
     {
-        List<ChannelLastMsg> list = new ArrayList<>();
-        list.add(new ChannelLastMsg(lastID, null)
         while (true) {
-            String a = client.getMessage(list, Client.token); //getMessage
-            System.out.println(a);
+            try{
+                String a = client.getMessage(Client.list, Client.token); //getMessage
+                if(!a.equals(""))
+                    System.out.println(a);
+            }
+            catch(Exception e)
+            {
+                
+            }
             Thread.sleep(500);
         }
     }

@@ -33,7 +33,7 @@ public class ServerHandler implements ServerService.Iface {
     
     @Override
     public String regNick(String token, String nick) throws TException {
-        if (token == null && nick != null) {
+        if (token.equals("") && nick != null) {
             if (isNickExist(nick)) {
                 //nick exists
                 return "Nick exists!";
@@ -44,7 +44,7 @@ public class ServerHandler implements ServerService.Iface {
                 return nick;
             }
         }
-        else if (token == null && nick == null) {
+        else if (token.equals("") && nick == null) {
             String newNick = "";
             do {
                 newNick = randomNick();
@@ -153,7 +153,7 @@ public class ServerHandler implements ServerService.Iface {
             FindIterable<Document> iterable = messageCollection.find(new Document("id", new Document("$gt", channelStruct.lastID)));
             for(Document doc : iterable)
             {
-                if(doc.getString("nick").equals(token))
+//                if(doc.getString("nick").equals(token))
                     messages = messages + channelStruct.channel+":@" + token + ' ' + doc.getString("message") + '\n';
 //                    System.out.println(doc.getString("message"));
             }
@@ -193,7 +193,7 @@ public class ServerHandler implements ServerService.Iface {
         } catch (Exception e) {
             if (message.compareTo("/NICK") == 0) {
                 //random nick
-                response = regNick(token, null);
+                response = regNick(token, randomNick());
             }
             else if ((message.compareTo("/JOIN") == 0) || (message.compareTo("/LEAVE") == 0)) {
                 //error
